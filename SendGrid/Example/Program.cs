@@ -25,7 +25,7 @@ namespace Example
             GlobalSuppressions();
             GlobalStats();
             */
-            CustomFields();
+            Recipients();
         }
         
         private static void SendAsync(SendGrid.SendGridMessage message)
@@ -301,6 +301,34 @@ namespace Example
             Console.WriteLine(response.Content.ReadAsStringAsync().Result);
             Console.WriteLine("Deleted new custom field. Press any key to continue.");
             Console.ReadKey();
+        }
+
+        private static void Recipients()
+        {
+            var apiKey = Environment.GetEnvironmentVariable("SENDGRID_APIKEY", EnvironmentVariableTarget.User);
+            var client = new SendGrid.Client(apiKey);
+
+            HttpResponseMessage response = client.Recipients.Get().Result;
+            Console.WriteLine(response.StatusCode);
+            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+            Console.WriteLine("These are your current recipients. Press any key to continue.");
+            Console.ReadKey();
+
+            response = client.Recipients.Post(new SendGrid.Models.Contacts.Recipient { Email = "test@testerson.com", FirstName = "First", LastName = "Last" }).Result;
+            string rawString = response.Content.ReadAsStringAsync().Result;
+            dynamic jsonObject = JObject.Parse(rawString);
+            string id = jsonObject.persisted_recipients[0].Value;
+            Console.WriteLine(response.StatusCode);
+            Console.WriteLine(rawString);
+            Console.WriteLine("These new users. Press any key to continue.");
+            Console.ReadKey();
+
+            response = client.Recipients.Delete(id).Result;
+            Console.WriteLine(response.StatusCode);
+            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+            Console.WriteLine("Deleted new user. Press any key to continue.");
+            Console.ReadKey();
+            
         }
     }
 }

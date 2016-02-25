@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace SendGrid.Resources.Contacts
@@ -31,22 +33,25 @@ namespace SendGrid.Resources.Contacts
         }
         public async Task<HttpResponseMessage> Post(IEnumerable<Models.Contacts.Recipient> recipients)
         {
-            // todo: use serilize?
-            var data = new JObject();
-            var innerArray = new JArray();
+            var objects = new List<dynamic>();
             foreach (var recipient in recipients)
             {
-                var innerData = new JObject(
-                        new JProperty("first_name", recipient.FirstName),
-                        new JProperty("last_name", recipient.LastName),
-                        new JProperty("email", recipient.Email));
+                dynamic innerData = new ExpandoObject();
+                innerData.first_name = recipient.FirstName;
+                innerData.last_name = recipient.LastName;
+                innerData.email = recipient.Email;
+                var p = innerData as IDictionary<string, object>;
                 foreach (var field in recipient.CustomFields)
                 {
-                    innerData.Add(new JProperty(field.Name, field.Value));
+                    p[field.Name] = field.Value;
                 }
-                innerArray.Add(innerData);
+                objects.Add(innerData);
             }
-            data.Add(innerArray);
+
+            //var data = new JObject(new JProperty("", objects.ToArray()));
+            var s = JsonConvert.SerializeObject(objects.ToArray(), Formatting.None).ToString();
+            System.Diagnostics.Debug.WriteLine(s);
+            var data = JArray.Parse(s);
 
             return await _client.Post(_endpoint, data);
         }

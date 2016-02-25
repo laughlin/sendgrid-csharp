@@ -68,7 +68,7 @@ namespace SendGrid.Resources.Contacts
 
         public async Task<HttpResponseMessage> AddToList(int listId, string recipientId)
         {
-            return await _client.Post(string.Concat(_endpoint, "/", listId, "/recipient/", recipientId), null);
+            return await _client.Post(string.Concat(_endpoint, "/", listId, "/recipient/", recipientId), (JObject)null);
         }
         public async Task<HttpResponseMessage> DeleteFromList(int listId, string recipientId)
         {
