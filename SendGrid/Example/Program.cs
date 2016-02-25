@@ -25,7 +25,7 @@ namespace Example
             GlobalSuppressions();
             GlobalStats();
             */
-            Campaigns();
+            CustomFields();
         }
         
         private static void SendAsync(SendGrid.SendGridMessage message)
@@ -277,6 +277,30 @@ namespace Example
             
         }
         
+        private static void CustomFields()
+        {
+            var apiKey = Environment.GetEnvironmentVariable("SENDGRID_APIKEY", EnvironmentVariableTarget.User);
+            var client = new SendGrid.Client(apiKey);
 
+            HttpResponseMessage response = client.CustomFields.Get().Result;
+            Console.WriteLine(response.StatusCode);
+            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+            Console.WriteLine("These are your current custom fields. Press any key to continue.");
+            Console.ReadKey();
+
+            response = client.CustomFields.Post("testField", "text").Result;
+            string rawString = response.Content.ReadAsStringAsync().Result;
+            dynamic jsonObject = JObject.Parse(rawString);
+            Console.WriteLine(response.StatusCode);
+            Console.WriteLine(rawString);
+            Console.WriteLine("These new custom field. Press any key to continue.");
+            Console.ReadKey();
+
+            response = client.CustomFields.Delete(jsonObject.id.ToString()).Result;
+            Console.WriteLine(response.StatusCode);
+            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+            Console.WriteLine("Deleted new custom field. Press any key to continue.");
+            Console.ReadKey();
+        }
     }
 }
