@@ -10,6 +10,9 @@ namespace Example
     {
         private static void Main()
         {
+            Environment.SetEnvironmentVariable("SENDGRID_APIKEY", "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");
+            Environment.SetEnvironmentVariable("SENDGRID_APIKEY", "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", EnvironmentVariableTarget.User);
+            /*
             // Test sending email 
             var to = "example@example.com";
             var from = "example@example.com";
@@ -21,6 +24,8 @@ namespace Example
             Suppressions();
             GlobalSuppressions();
             GlobalStats();
+            */
+            Campaigns();
         }
         
         private static void SendAsync(SendGrid.SendGridMessage message)
@@ -257,6 +262,19 @@ namespace Example
             Console.WriteLine(response.Content.ReadAsStringAsync().Result);
             Console.WriteLine("Display global email stats, with start date " + startDate + "and end date " + endDate + " and aggregated by " + aggregatedBy + ".\n\nPress any key to continue.");
             Console.ReadKey();
+        }
+
+        private static void Campaigns()
+        {
+            var apiKey = Environment.GetEnvironmentVariable("SENDGRID_APIKEY", EnvironmentVariableTarget.User);
+            var client = new SendGrid.Client(apiKey);
+
+            HttpResponseMessage response = client.Campaigns.Get().Result;
+            Console.WriteLine(response.StatusCode);
+            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+            Console.WriteLine("These are your current Campaigns. Press any key to continue.");
+            Console.ReadKey();
+            
         }
 
     }

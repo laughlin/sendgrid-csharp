@@ -18,6 +18,7 @@ namespace SendGrid
         public Suppressions Suppressions;
         public GlobalSuppressions GlobalSuppressions;
         public GlobalStats GlobalStats;
+        public Campaigns Campaigns { get; set; }
         public string Version;
         private Uri _baseUri;
         private const string MediaType = "application/json";
@@ -41,6 +42,7 @@ namespace SendGrid
             Suppressions = new Suppressions(this);
             GlobalSuppressions = new GlobalSuppressions(this);
             GlobalStats = new GlobalStats(this);
+            Campaigns = new Campaigns(this);
         }
 
         /// <summary>
