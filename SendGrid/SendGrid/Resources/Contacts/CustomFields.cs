@@ -25,8 +25,7 @@ namespace SendGrid.Resources.Contacts
             _client = client;
         }
 
-        public async Task<HttpResponseMessage> Get()
-        {
+        public async Task<HttpResponseMessage> Get()        {
             return await _client.Get(_endpoint);
         }
         public async Task<HttpResponseMessage> Get(int customFieldId)

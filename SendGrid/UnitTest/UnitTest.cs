@@ -279,4 +279,76 @@ namespace UnitTest
             Assert.IsNotNull(jsonObject);
         }
     }
+
+    [TestFixture]
+    public class CustomFields
+    {
+        static string _baseUri = "https://api.sendgrid.com/";
+        static string _apiKey = Environment.GetEnvironmentVariable("SENDGRID_APIKEY");
+        public Client client = new Client(_apiKey, _baseUri);
+        private static string _id = "";
+
+        [Test]
+        public void ApiKeysIntegrationTest()
+        {
+            TestGet();
+            TestPost();
+            TestDelete();
+        }
+
+        private void TestGet()
+        {
+            HttpResponseMessage response = client.CustomFields.Get().Result;
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            string rawString = response.Content.ReadAsStringAsync().Result;
+            dynamic jsonObject = JObject.Parse(rawString);
+            string jsonString = jsonObject.result.ToString();
+            Assert.IsNotNull(jsonString);
+        }
+
+        private void TestPost()
+        {
+            HttpResponseMessage response = client.CustomFields.Post("custom_field", "text").Result;
+            Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+            string rawString = response.Content.ReadAsStringAsync().Result;
+            dynamic jsonObject = JObject.Parse(rawString);
+            _id = jsonObject.id.ToString();
+            string name = jsonObject.name.ToString();
+            Assert.IsNotNull(_id);
+            Assert.IsNotNull(name);
+        }
+
+        private void TestDelete()
+        {
+            HttpResponseMessage response = client.ApiKeys.Delete(_id).Result;
+            Assert.AreEqual(HttpStatusCode.NoContent, response.StatusCode);
+        }
+
+        [Test]
+        public void TestGetOnce()
+        {
+            var responseGet = client.CustomFields.Get().Result;
+        }
+
+        [Test]
+        public void TestGetTenTimes()
+        {
+            HttpResponseMessage responseGet;
+            for (int i = 0; i < 10; i++)
+            {
+                responseGet = client.CustomFields.Get().Result;
+            }
+        }
+
+        [Test]
+        public void TestGetTenTimesAsync()
+        {
+            Task[] tasks = new Task[10];
+            for (int i = 0; i < 10; i++)
+            {
+                tasks[i] = client.CustomFields.Get();
+            }
+            Task.WaitAll(tasks);
+        }
+    }
 }

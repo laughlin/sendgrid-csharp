@@ -7,6 +7,7 @@ using System.Text;
 using SendGrid.Resources;
 using System.Net;
 using Newtonsoft.Json.Linq;
+using SendGrid.Resources.Contacts;
 
 namespace SendGrid
 {
@@ -18,7 +19,9 @@ namespace SendGrid
         public Suppressions Suppressions;
         public GlobalSuppressions GlobalSuppressions;
         public GlobalStats GlobalStats;
-        public Campaigns Campaigns { get; set; }
+        public Campaigns Campaigns;
+        public CustomFields CustomFields;
+
         public string Version;
         private Uri _baseUri;
         private const string MediaType = "application/json";
@@ -43,6 +46,7 @@ namespace SendGrid
             GlobalSuppressions = new GlobalSuppressions(this);
             GlobalStats = new GlobalStats(this);
             Campaigns = new Campaigns(this);
+            CustomFields = new CustomFields(this);
         }
 
         /// <summary>
