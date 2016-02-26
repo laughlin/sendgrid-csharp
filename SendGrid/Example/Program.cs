@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Mail;
 using Newtonsoft.Json.Linq;
+using SendGrid.Models.Contacts;
 
 namespace Example
 {
@@ -339,20 +340,20 @@ namespace Example
             - Add 3 to hardcoded list
             - Send list to email
             */
-            var campaignId = 125245;
-            var listId = 68938;
+            const int campaignId = 125245;
+            const int listId = 68938;
             var apiKey = Environment.GetEnvironmentVariable("SENDGRID_APIKEY", EnvironmentVariableTarget.User);
             var client = new SendGrid.Client(apiKey);
 
             var recipientIds = new List<string>();
             // readding these does not duplicate
             var response = client.Recipients.Post(
-                new SendGrid.Models.Contacts.Recipient[] {
-                    new SendGrid.Models.Contacts.Recipient { Email = "jgeiger@laughlin.com", FirstName = "First-1", LastName = "Last-1" },
-                    new SendGrid.Models.Contacts.Recipient { Email = "jgeiger2@laughlin.com", FirstName = "First-2", LastName = "Last-2" },
-                    new SendGrid.Models.Contacts.Recipient { Email = "jgeiger3@laughlin.com", FirstName = "First-3", LastName = "Last-3" }
+                new [] {
+                    new Recipient { Email = "jgeiger@laughlin.com", FirstName = "First-1", LastName = "Last-1" },
+                    new Recipient { Email = "jgeiger2@laughlin.com", FirstName = "First-2", LastName = "Last-2" },
+                    new Recipient { Email = "jgeiger3@laughlin.com", FirstName = "First-3", LastName = "Last-3" }
                 }).Result;
-            string rawString = response.Content.ReadAsStringAsync().Result;
+            var rawString = response.Content.ReadAsStringAsync().Result;
             dynamic jsonObject = JObject.Parse(rawString);
             recipientIds.Add(jsonObject.persisted_recipients[0].Value);
             recipientIds.Add(jsonObject.persisted_recipients[1].Value);
@@ -362,10 +363,12 @@ namespace Example
             {
                 response = client.Lists.AddToList(listId, recipient).Result;
                 rawString = response.Content.ReadAsStringAsync().Result;
-                jsonObject = JObject.Parse(rawString);
             }
 
             response = client.Campaigns.Send(campaignId.ToString()).Result;
+            rawString = response.Content.ReadAsStringAsync().Result;
+            Console.WriteLine(rawString);
+            Console.ReadKey();
         }
         
     }
