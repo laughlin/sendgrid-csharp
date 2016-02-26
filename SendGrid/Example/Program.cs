@@ -25,7 +25,7 @@ namespace Example
             GlobalSuppressions();
             GlobalStats();
             */
-            Recipients();
+            PoC();
         }
         
         private static void SendAsync(SendGrid.SendGridMessage message)
@@ -330,5 +330,43 @@ namespace Example
             Console.ReadKey();
             
         }
+
+        private static void PoC()
+        {
+            /*            
+            Some of this is hardcoded
+            - Add 3 users
+            - Add 3 to hardcoded list
+            - Send list to email
+            */
+            var campaignId = 125245;
+            var listId = 68938;
+            var apiKey = Environment.GetEnvironmentVariable("SENDGRID_APIKEY", EnvironmentVariableTarget.User);
+            var client = new SendGrid.Client(apiKey);
+
+            var recipientIds = new List<string>();
+            // readding these does not duplicate
+            var response = client.Recipients.Post(
+                new SendGrid.Models.Contacts.Recipient[] {
+                    new SendGrid.Models.Contacts.Recipient { Email = "jgeiger@laughlin.com", FirstName = "First-1", LastName = "Last-1" },
+                    new SendGrid.Models.Contacts.Recipient { Email = "jgeiger2@laughlin.com", FirstName = "First-2", LastName = "Last-2" },
+                    new SendGrid.Models.Contacts.Recipient { Email = "jgeiger3@laughlin.com", FirstName = "First-3", LastName = "Last-3" }
+                }).Result;
+            string rawString = response.Content.ReadAsStringAsync().Result;
+            dynamic jsonObject = JObject.Parse(rawString);
+            recipientIds.Add(jsonObject.persisted_recipients[0].Value);
+            recipientIds.Add(jsonObject.persisted_recipients[1].Value);
+            recipientIds.Add(jsonObject.persisted_recipients[2].Value);
+            
+            foreach (var recipient in recipientIds)
+            {
+                response = client.Lists.AddToList(listId, recipient).Result;
+                rawString = response.Content.ReadAsStringAsync().Result;
+                jsonObject = JObject.Parse(rawString);
+            }
+
+            response = client.Campaigns.Send(campaignId.ToString()).Result;
+        }
+        
     }
 }

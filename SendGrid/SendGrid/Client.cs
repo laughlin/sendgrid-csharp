@@ -22,6 +22,7 @@ namespace SendGrid
         public CustomFields CustomFields;
         public Recipients Recipients;
         public Campaigns Campaigns;
+        public Lists Lists { get; set; }
         public string Version;
         private Uri _baseUri;
         private const string MediaType = "application/json";
@@ -48,6 +49,7 @@ namespace SendGrid
             Recipients = new Recipients(this);
             CustomFields = new CustomFields(this);
             Campaigns = new Campaigns(this);
+            Lists = new Lists(this);
         }
 
         /// <summary>

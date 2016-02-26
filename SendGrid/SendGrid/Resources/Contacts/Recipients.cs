@@ -63,11 +63,11 @@ namespace SendGrid.Resources.Contacts
             query["pageSize"] = pageSize.ToString();
             return await _client.Get(string.Concat(_endpoint, "?", query));
         }
-        public async Task<HttpResponseMessage> Get(int recipientId)
+        public async Task<HttpResponseMessage> Get(string recipientId)
         {
             return await _client.Get(string.Concat(_endpoint, "/", recipientId));
         }
-        public async Task<HttpResponseMessage> Delete(int recipientId)
+        public async Task<HttpResponseMessage> Delete(string recipientId)
         {
             return await _client.Delete(string.Concat(_endpoint, "/", recipientId));
         }
